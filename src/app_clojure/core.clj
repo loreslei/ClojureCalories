@@ -1,29 +1,38 @@
 (ns app-clojure.core
   (:require
    [clojure.string :as str]
-   [app-clojure.nutrition :refer [buscar-alimento buscar-exercicio]])
+   [app-clojure.nutrition :refer [buscar-alimento buscar-exercicio]]
+   [app-clojure.tradutor :refer [traduzir-en-pt traduzir-pt-en]]
+   
+   [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+   [compojure.core :refer [defroutes GET]] 
+   [compojure.route :as route])
   (:gen-class))
 
+(defroutes app-routes
+  (GET "/" [] "Olá, mundo!")
+  (route/not-found "Página não encontrada"))
 
-
-
+(def app
+  (wrap-defaults app-routes site-defaults))
 
 (defn imprimir-alimentos [alimentos]
   (dorun
    (map (fn [item]
-          (println (:food_name item) ":" (:nf_calories item) "calorias"))
+          (println (traduzir-en-pt(:food_name item)) ":" (:nf_calories item) "calorias"))
         alimentos)))
 
 (defn imprimir-exercicios [exercicios]
   (dorun
    (map (fn [item]
-          (println (:name item)
+          (println (traduzir-en-pt (:name item))
                    (:nf_calories item) "calorias queimadas"
                    "em" (:duration_min item) "minutos"))
         exercicios)))
 
 
-(defn menu [idade altura peso genero]
+
+(defn menu []
   (print "\nO que deseja calcular?\n[A] Alimento\n[E] Exercicio\n[S] Sair\nDigite A, E ou S: ")
   (flush)
   (let [opcao (str/upper-case (read-line))]
@@ -32,21 +41,23 @@
       (do
         (print "Digite os alimentos consumidos: ")
         (flush)
-        (let [entrada (read-line)
-              resultado (buscar-alimento entrada)]
+        (let [entrada (read-line) 
+              resultado (buscar-alimento (traduzir-pt-en (str entrada)))
+              ]
+          ;; (println entrada)
           (println "\nResultado dos alimentos:")
-          (imprimir-alimentos resultado))
-        (recur idade altura peso genero))
+          (imprimir-alimentos resultado)
+        (recur))) ; recursão de cauda
 
       (= opcao "E")
       (do
         (print "Descreva o exercicio feito: ")
         (flush)
         (let [entrada (read-line)
-              resultado (buscar-exercicio entrada peso altura idade genero)]
+              resultado (buscar-exercicio (traduzir-pt-en entrada))]
           (println "\nResultado dos exercicios:")
           (imprimir-exercicios resultado))
-        (recur idade altura peso genero)) ; recursão de cauda
+        (recur)) ; recursão de cauda
 
       (= opcao "S")
       (println "Encerrando o programa. Ate mais!")
@@ -54,36 +65,8 @@
       :else
       (do
         (println "Opcao invalida. Use A, E ou S.")
-        (recur idade altura peso genero))))) ; recursão de cauda
+        (recur))))) ; recursão de cauda
 
-(defn -main [& _]
-  (def diario
-    (atom
-     {:data "2025-05-25"
-      :alimentos []
-      :atividades []}))
-
-  (let [_ (println "Digite seu nome: ")
-        nome (read-line)
-
-        _ (println "Digite seu genero: ")
-        genero (read-line)
-
-        _ (println "Digite sua idade: ")
-        idade (read-line)
-
-        _ (println "Digite sua altura: ")
-        altura (read-line)
-
-        _ (println "Digite seu peso: ")
-        peso (read-line)]
-    
-    (println "\nDados capturados:")
-    (println "Nome:" nome)
-    (println "Genero:" genero)
-    (println "Idade:" idade)
-    (println "Altura:" altura)
-    (println "Peso:" peso)
-    (menu idade altura peso genero) 
-    )
-)
+(defn -main [& _] 
+  
+  (menu))
