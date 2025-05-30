@@ -35,8 +35,7 @@
       ;; (println "11111111")
       ;; (println "Resultado traduzido (antes de limpar):" resultado)
       ;; (limpar-texto resultado)
-      resultado
-      )))
+      resultado)))
 
 (defn traduzir-en-pt [texto]
   (let [url (str "https://api.mymemory.translated.net/get?q=" (java.net.URLEncoder/encode (capitalizar texto) "UTF-8") "&langpair=en|pt")
@@ -44,5 +43,4 @@
         data (json/read-str (:body response) :key-fn keyword)
         resultado (get-in data [:responseData :translatedText])]
     ;; (limpar-texto resultado)
-    resultado
-    ))
+    resultado))

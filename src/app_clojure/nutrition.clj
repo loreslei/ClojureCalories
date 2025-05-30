@@ -4,7 +4,7 @@
             [cheshire.core :as json]
             [clojure.string :as str])
   (:gen-class))
-  
+
 (def app-id (System/getenv "app_id"))
 (def app-key (System/getenv "app_key"))
 
@@ -18,9 +18,12 @@
   (let [url "https://trackapi.nutritionix.com/v2/natural/nutrients"
         headers {"x-app-id" app-id
                  "x-app-key" app-key
-                 "Content-Type" "application/json; charset=UTF-8" }
+                 "Content-Type" "application/json; charset=UTF-8"}
         body (json/generate-string {:query texto})
-        resposta (http/post url {:headers headers :body body :as :json})]
+        resposta (http/post url {:headers headers
+                                 :body body
+                                 :as :json
+                                 :keywords? true})]
     (get-in resposta [:body :foods])))
 
 (defn buscar-exercicio [texto]

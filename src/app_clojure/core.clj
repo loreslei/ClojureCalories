@@ -1,34 +1,32 @@
 (ns app-clojure.core
   (:require
-   [clojure.string :as str]
    [app-clojure.nutrition :refer [buscar-alimento buscar-exercicio]]
    [app-clojure.tradutor :refer [traduzir-en-pt traduzir-pt-en]]
-   
-   [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-   [compojure.core :refer [defroutes GET]] 
-   [compojure.route :as route])
+   [clojure.string :as str]
+   [compojure.core :refer :all]
+   [ring.adapter.jetty :refer [run-jetty]]
+   ;;[clj-http.client :as client]
+   [app-clojure.food-calories :refer [adicionar-alimento adicionar-exercicio listar-alimentos]]
+   [app-clojure.handler :refer [app app-routes]])
   (:gen-class))
 
-(defroutes app-routes
-  (GET "/" [] "Olá, mundo!")
-  (route/not-found "Página não encontrada"))
 
-(def app
-  (wrap-defaults app-routes site-defaults))
+(defn imprimir-alimentos [items]
+  ;; Pega o primeiro mapa de alimento do vetor
+  (let [item (first items)
+        registro {:alimento (traduzir-en-pt (:food_name item))
+                  :calorias (:nf_calories item)}]
+    (adicionar-alimento registro)
+    (println "Alimento enviado ao servidor:" registro)))
 
-(defn imprimir-alimentos [alimentos]
-  (dorun
-   (map (fn [item]
-          (println (traduzir-en-pt(:food_name item)) ":" (:nf_calories item) "calorias"))
-        alimentos)))
+
 
 (defn imprimir-exercicios [exercicios]
-  (dorun
-   (map (fn [item]
-          (println (traduzir-en-pt (:name item))
-                   (:nf_calories item) "calorias queimadas"
-                   "em" (:duration_min item) "minutos"))
-        exercicios)))
+  (let [exercicio (first exercicios)
+        registro {:exercicio (traduzir-en-pt (:name exercicio))
+                  :calorias (:nf_calories exercicio)}]
+    (adicionar-exercicio registro)
+    (println "Exercicio enviado ao servidor:" registro)))
 
 
 
@@ -41,13 +39,12 @@
       (do
         (print "Digite os alimentos consumidos: ")
         (flush)
-        (let [entrada (read-line) 
-              resultado (buscar-alimento (traduzir-pt-en (str entrada)))
-              ]
-          ;; (println entrada)
+        (let [entrada (read-line)
+              resultado (buscar-alimento (traduzir-pt-en (str entrada)))]
+          ;;(println entrada)
           (println "\nResultado dos alimentos:")
           (imprimir-alimentos resultado)
-        (recur))) ; recursão de cauda
+          (recur))) ; recursão de cauda
 
       (= opcao "E")
       (do
@@ -67,6 +64,6 @@
         (println "Opcao invalida. Use A, E ou S.")
         (recur))))) ; recursão de cauda
 
-(defn -main [& _] 
-  
+(defn -main [& _]
+  (run-jetty app {:port 3000 :join? false})
   (menu))
