@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [clj-http.client :as client]
             [clojure.data.json :as json]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            )
   (:import [java.net URLEncoder]
            [java.text Normalizer Normalizer$Form]))
 
@@ -20,10 +21,10 @@
 ;;     (println "Texto sanitizado:" limpo)
 ;;     limpo))
 
-(defn capitalizar [texto]
-  (let [primeira (subs texto 0 1)
-        resto (subs texto 1)]
-    (str (.toUpperCase primeira) (.toLowerCase resto))))
+(defn capitalizar [s]
+  (if (str/blank? s) ;; Check if s is nil or empty/whitespace
+    "" ;; Return an empty string or handle as appropriate for your application
+    (str (str/upper-case (subs s 0 1)) (subs s 1))))
 
 (defn traduzir-pt-en [texto]
   (let [url (str "https://api.mymemory.translated.net/get?q=" (java.net.URLEncoder/encode (capitalizar texto) "UTF-8") "&langpair=pt|en")

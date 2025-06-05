@@ -5,9 +5,10 @@
             [ring.middleware.defaults :refer [api-defaults wrap-defaults]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
+            [ring.middleware.params :refer [wrap-params]]
             [ring.util.response :refer [response status]]
             [front.front-end :refer [home-page]]
-            [app-clojure.food-calories :refer [adicionar-alimento listar-alimentos listar-exercicios]]
+            [app-clojure.food-calories :refer [adicionar-alimento listar-alimentos listar-exercicios registrar-alimento registrar-exercicio]] 
             ))
 
 ;; Controller de perda
@@ -32,6 +33,8 @@
 (defroutes app-routes 
   (POST "/adicionar/alimento" [] adicionar-alimento)
   (POST "/adicionar/exercicio" [] adicionar-alimento) 
+  (POST "/registrar/alimento" [] registrar-alimento)
+  (POST "/registrar/exercicio" [] registrar-exercicio)
   (GET "/listar/alimentos" [] listar-alimentos)
   (GET "/listar/exercicios" [] listar-exercicios)
   (GET "/" [] (home-page))
@@ -41,12 +44,13 @@
 ;; App
 (def app
   (-> app-routes
-      (wrap-resource "public")      ;; serve static resources da pasta resources/public
-      wrap-content-type             ;; adiciona content-type correto para os arquivos
-      (wrap-json-body {:keywords? true}) ;; parse JSON com keywords para facilitar desestruturação
-      wrap-json-response
-      (wrap-defaults api-defaults)
-      ))
+      (wrap-resource "public")               ; para arquivos estáticos
+      wrap-content-type                      ; content-type correto
+      wrap-params                            ; necessário para extrair params de formulários (OBRIGATÓRIO!)
+      (wrap-json-body {:keywords? true})     ; só faz sentido para JSON (API)
+      wrap-json-response                     ; transforma mapas em JSON (API)
+      (wrap-defaults api-defaults)))         ; configurações padrão para API
+
 
 
 

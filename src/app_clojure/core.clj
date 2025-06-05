@@ -6,27 +6,11 @@
    [compojure.core :refer :all]
    [ring.adapter.jetty :refer [run-jetty]]
    ;;[clj-http.client :as client]
-   [app-clojure.food-calories :refer [adicionar-alimento adicionar-exercicio listar-alimentos]]
-   [app-clojure.handler :refer [app app-routes]])
+   [app-clojure.food-calories :refer [adicionar-alimento adicionar-exercicio listar-alimentos imprimir-alimentos imprimir-exercicios]]
+   [app-clojure.handler :refer [app app-routes]]
+   )
   (:gen-class))
 
-
-(defn imprimir-alimentos [items]
-  ;; Pega o primeiro mapa de alimento do vetor
-  (let [item (first items)
-        registro {:alimento (traduzir-en-pt (:food_name item))
-                  :calorias (:nf_calories item)}]
-    (adicionar-alimento registro)
-    (println "Alimento enviado ao servidor:" registro)))
-
-
-
-(defn imprimir-exercicios [exercicios]
-  (let [exercicio (first exercicios)
-        registro {:exercicio (traduzir-en-pt (:name exercicio))
-                  :calorias (:nf_calories exercicio)}]
-    (adicionar-exercicio registro)
-    (println "Exercicio enviado ao servidor:" registro)))
 
 
 
