@@ -7,7 +7,7 @@
    [:div {:class "w-85/100 rounded-2xl py-6 px-12 shadow-2xl bg-white md:w-1/2 lg:w-1/3"}
     [:h1 {:class "text-center font-semibold text-slate-700 text-2xl"}
      "Registrar Alimentos ou Exercícios"]
-    [:div {:class "my-5 flex flex-col gap-4"}
+    [:div {:class "my-5"}
 
   
               [:div {:class "flex justify-center mt-2 gap-3"}
@@ -17,10 +17,10 @@
                 [:label {:for "toggle" :class "toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"}]]
                [:label {:id "exerciseLabel" :for "toggle" :class "text-sm text-gray-700"} "Exercício"]]
 
-              [:div {:class "flex flex-col gap-4"}
+        
               ;;  Alimento
                (form-to [:post "/registrar/alimento" {:id "formAlimento"}] 
-                 [:div {:id "Food"}
+                 [:div {:id "Food" :class "flex flex-col gap-4"}
                   [:p {:class "p-2 text-slate-600 font-semibold"} "Alimento"]
                   [:div {:class "flex items-center"}
                    [:div {:class "h-10 w-11 rounded-l-xl border-y-1 border-l-1 border-slate-300 p-2 flex items-center justify-center"}
@@ -34,7 +34,7 @@
                )
 
                (form-to [:post "/registrar/exercicio" {:id "formExercicio" :class "hidden"}] 
-                 [:div {:id "Exercise" :class "hidden"}
+                 [:div {:id "Exercise" :class "hidden flex flex-col gap-4"}
                   [:p {:class "p-2 text-slate-600 font-semibold"} "Exercício"]
                   [:div {:class "flex items-center"}
                    [:div {:class "h-10 w-11 rounded-l-xl border-y-1 border-l-1 border-slate-300 p-2 flex items-center justify-center"}
@@ -47,7 +47,7 @@
                         
               )
                 
-              ]
+              
        
 
      ;;  ;; Exercício
