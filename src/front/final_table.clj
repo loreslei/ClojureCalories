@@ -2,6 +2,7 @@
   (:require [clj-http.client :as http]
             [cheshire.core :as json]))
 
+
 (defn final-table []
   (let [; Busca dados reais da API
         alimentos (-> (http/get "http://localhost:3000/listar/alimentos" {:as :json}) :body)
@@ -38,6 +39,18 @@
 
     [:div {:class "w-85/100 rounded-lg bg-white flex flex-col items-center mt-20 mb-20 shadow-2xl md:w-1/2 lg:w-1/3 mx-auto"}
      [:div {:class "relative flex flex-col w-full h-full overflow-auto text-gray-700 bg-white rounded-lg"}
+      [:div {:class "flex justify-center items-center gap-3 p-4 border-b border-slate-200"}
+       [:input {:type "date"
+                :id "dataInicio"
+                :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
+       [:span "até"]
+       [:input {:type "date"
+                :id "dataFim"
+                :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
+       [:button {:id "filtrarBtn"
+                 :class "bg-indigo-500 text-white px-4 py-1 rounded hover:bg-indigo-600 transition"}
+        "Filtrar"]]
+
       [:table {:class "w-full text-left table-auto min-w-max appearance-none"}
        [:thead {:class "rounded-xl"}
         [:tr

@@ -8,6 +8,10 @@
                  [cheshire "5.11.0"]
                  [compojure "1.7.0"]
                  [org.clojure/tools.cli "0.4.1"]
+                 [org.clojure/clojure "1.11.1"]
+                 [org.clojure/clojurescript "1.11.60"]
+                 [clojure.java-time "0.3.3"]
+                 [reagent "1.2.0"] ; <- Adicione esta linha
                  [ring/ring-json "0.5.1"]
                  [ring/ring-defaults "0.3.4"] 
                  [hiccup "1.0.5"]
