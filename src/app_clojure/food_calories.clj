@@ -1,101 +1,38 @@
-(ns app-clojure.food-calories 
+(ns app-clojure.food-calories
   (:require
-   [cheshire.core :refer [generate-string]]
-   [app-clojure.tradutor :refer [traduzir-en-pt traduzir-pt-en]]
-   [app-clojure.nutrition :refer [buscar-alimento buscar-exercicio]]
-  ))
+   [app-clojure.tradutor :refer [capitalizar traduzir-pt-en]]
+   [app-clojure.nutrition :refer [buscar-alimento]]
+   [clj-time.core :as t]      ; <-- Importe clj-time.core
+   [clj-time.format :as f]))  ; <-- Importe clj-time.format para formatar a data
 
-(defn como-json [conteudo & [status]]
-  {:status (or status 200)
-   :headers {"Content-Type" "application/json; charset=utf-8"}
-   :body (generate-string conteudo)})
+;; Um formatador de data/hora ISO 8601. É um formato universalmente aceito e fácil de ordenar.
+(def iso-formatter (f/formatter :date-time-no-ms))
 
 ;; Atom para armazenar alimentos e calorias
 (def alimentos-atom (atom []))
 
-;; Atom para armazenar exercicios e calorias
-(def exercicios-atom (atom []))
-
-;Rota POST para receber alimento e quantidade e salvar no atom
-(defn adicionar-alimento [req]
-  (let [
-        ;;body (:body req)
-        alimento (:alimento req)
-        calorias (:calorias req)
-        registro {:alimento alimento
-                  :calorias calorias}] 
-    
-    (swap! alimentos-atom conj registro)
-    (como-json {:success true
-                :mensagem "Alimento registrado com sucesso!"
-                :registro registro})))
-
-;Rota POST para receber exercicio e quantidade e salvar no atom
-(defn adicionar-exercicio [req]
-  (let [
-        ;;body (:body req)
-        exercicio (:exercicio req)
-        calorias (:calorias req)
-        registro {:exercicio exercicio
-                  :calorias calorias}] 
-    (swap! exercicios-atom conj registro)
-    (como-json {:success true
-                :mensagem "Exercicio registrado com sucesso!"
-                :registro registro})))
-
-(defn imprimir-alimentos [items]
-  ;; Pega o primeiro mapa de alimento do vetor
-  (let [item (first items)
-        registro {:alimento (traduzir-en-pt (:food_name item))
-                  :calorias (:nf_calories item)}]
-    (adicionar-alimento registro)
-    (println "Alimento enviado ao servidor:" registro)))
-
+;; Função para registrar um alimento
 (defn registrar-alimento [req]
-  ;;(println "REQ PARAMS:" (:params req))
-  (let [alimento-pt (:alimento (:params req))
+  (let [alimento-pt (get-in req [:params :alimento])
         alimento-en (traduzir-pt-en alimento-pt)
-        resultado (buscar-alimento alimento-en)
-        ]
-    (imprimir-alimentos resultado)
-    ;;(println "REQ PARAMS:" alimento-pt)
-    {:status 200
-     :headers {"Content-Type" "text/html; charset=utf-8"}
-     :body (str "<h2>Alimento registrado: " alimento-pt "</h2>"
-                "<a href='/'>Voltar</a>")}))
+        resultado (first (buscar-alimento alimento-en))
+        data-str (get-in req [:params :data]) ; <-- pega a string do input date (yyyy-MM-dd)
+        data-parseada (f/parse (f/formatter "yyyy-MM-dd") data-str) ; <-- parse ISO
+        data-formatada (f/unparse (f/formatter "dd-MM-yyyy") data-parseada) ; <-- converte para dd-MM-yyyy
+        registro {:alimento (capitalizar alimento-pt)
+                  :calorias (:nf_calories resultado)
+                  :dataRegistro (f/unparse iso-formatter (t/now)) ; data do sistema
+                  :dataAdicao data-formatada}] ; <-- data fornecida pelo usuário, formatada
 
-(defn imprimir-exercicios [exercicios]
-  (let [exercicio (first exercicios)
-        registro {:exercicio (traduzir-en-pt (:name exercicio))
-                  :calorias (:nf_calories exercicio)}]
-    (adicionar-exercicio registro)
-    (println "Exercicio enviado ao servidor:" registro)))
+    (swap! alimentos-atom conj registro)
+    {:status 302
+     :headers {"Location" "/"}
+     :body ""}))
 
 
-(defn registrar-exercicio [req]
-  ;(println "REQ PARAMS:" (:params req))
-  (let [exercicio-pt (:exercicio (:params req))
-        exercicio-en (traduzir-pt-en exercicio-pt)
-        resultado (buscar-exercicio exercicio-en)
-        ]
-    (imprimir-exercicios resultado)
-    ;(println "exercicio pt" exercicio-pt)
-    {:status 200
-     :headers {"Content-Type" "text/html; charset=utf-8"}
-     :body (str "<h2>Alimento registrado: " exercicio-pt "</h2>"
-                "<a href='/'>Voltar</a>")}))
 
-;; Rota GET para listar alimentos salvos
+;; Função para listar alimentos salvos (pode ser JSON ou HTML dependendo do seu front)
 (defn listar-alimentos [_]
   {:status 200
+   :headers {"Content-Type" "application/json"}
    :body @alimentos-atom})
-
-;; Rota GET para listar alimentos salvos
-(defn listar-exercicios [_]
-  {:status 200
-   :body @exercicios-atom})
-
-
-
-
-

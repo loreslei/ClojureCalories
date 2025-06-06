@@ -21,10 +21,12 @@
 ;;     (println "Texto sanitizado:" limpo)
 ;;     limpo))
 
-(defn capitalizar [s]
-  (if (str/blank? s) ;; Check if s is nil or empty/whitespace
-    "" ;; Return an empty string or handle as appropriate for your application
-    (str (str/upper-case (subs s 0 1)) (subs s 1))))
+(defn capitalizar [texto]
+  ;(println "capitalizar")
+  ;(println texto)
+  (let [primeira (subs texto 0 1)
+        resto (subs texto 1)]
+    (str (.toUpperCase primeira) (.toLowerCase resto))))
 
 (defn traduzir-pt-en [texto]
   (let [url (str "https://api.mymemory.translated.net/get?q=" (java.net.URLEncoder/encode (capitalizar texto) "UTF-8") "&langpair=pt|en")

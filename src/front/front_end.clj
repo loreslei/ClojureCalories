@@ -65,11 +65,12 @@
 };
     
     document.getElementById('Menu').onclick = toggleElements;
+    
     document.getElementById('Switch').addEventListener('change', changeType);
     
     ['close1', 'close2', 'close3'].forEach(id => {
         document.getElementById(id).onclick = toggleElements;
-    });
+    }); 
     
     const rowsPerPage = 5;
     let currentPage = 1;

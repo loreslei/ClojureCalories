@@ -22,7 +22,7 @@
 
     ;; Menu Oculto Mobile
     [:div {:id "MenuOculto"
-           :class "hidden w-screen flex flex-col bg-indigo-500 fixed top-15 mt-48 p-3 lg:hidden"}
+           :class "hidden w-screen flex flex-col bg-indigo-500 fixed top-14 p-3 lg:hidden"}
      (link-to "#user"
               [:div {:id "close1" :class "flex items-center gap-2 rounded-xl px-6 py-2 hover:bg-indigo-300 cursor-pointer"}
                [:i {:class "fa-solid fa-user text-white"}]

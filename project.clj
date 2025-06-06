@@ -12,6 +12,7 @@
                  [ring/ring-defaults "0.3.4"] 
                  [hiccup "1.0.5"]
                  [ring "1.9.6"]
+                 [clj-time "0.15.2"]
                  [org.clojure/data.json "2.4.0"]
                  [org.apache.commons/commons-text "1.10.0"]]
   :plugins [[lein-ring "0.12.5"]]
