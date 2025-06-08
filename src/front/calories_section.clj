@@ -22,7 +22,8 @@
                 [:p {:class "p-2 text-slate-600 font-semibold"} "Alimento"]
                 [:div {:class "relative group cursor-pointer"}
                  [:i {:class "fa-solid fa-circle-info text-slate-600 transition-all duration-200 hover:text-indigo-500"}]
-                 [:div {:class "absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block w-64 bg-gray-800 text-white text-sm p-3 rounded-lg shadow-lg z-10"}
+                 ;; ALTERADO AQUI: adicionado lg:group-hover:block e a classe tooltip-content
+                 [:div {:class "absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden lg:group-hover:block w-64 bg-gray-800 text-white text-sm p-3 rounded-lg shadow-lg z-10 tooltip-content"}
                   "Escreva no formato:"
                   [:br]
                   [:span {:class "text-indigo-300 font-medium"} "Nome do alimento + quantidade (gramas)"]
@@ -52,7 +53,8 @@
                 [:p {:class "p-2 text-slate-600 font-semibold"} "Exercício"]
                 [:div {:class "relative group cursor-pointer"}
                  [:i {:class "fa-solid fa-circle-info text-slate-600 transition-all duration-200 hover:text-indigo-500"}]
-                 [:div {:class "absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block w-64 bg-gray-800 text-white text-sm p-3 rounded-lg shadow-lg z-10"}
+                 ;; ALTERADO AQUI: adicionado lg:group-hover:block e a classe tooltip-content
+                 [:div {:class "absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden lg:group-hover:block w-64 bg-gray-800 text-white text-sm p-3 rounded-lg shadow-lg z-10 tooltip-content"}
                   "Escreva no formato:"
                   [:br]
                   [:span {:class "text-indigo-300 font-medium"} "Nome do exercício + duração (minutos)"]

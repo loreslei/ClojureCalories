@@ -29,11 +29,11 @@
               right: 0;
               border-color: #68D391;
           }
-      
+          
           .toggle-checkbox:checked+.toggle-label {
               background-color: #68D391;
           }
-      
+          
           body {
               font-family: \"Montserrat\", sans-serif !important;
           }
@@ -46,24 +46,22 @@
             (final-table operacoes-para-exibir dataInicio dataFim) ; <--- Passa as datas para final-table
             [:script
              "window.addEventListener('DOMContentLoaded', () => {
-                  const toggleElements = () => {
+                const toggleElements = () => {
           document.getElementById('MenuOculto').classList.toggle('hidden');
           document.getElementById('IconBars').classList.toggle('hidden');
           document.getElementById('IconClose').classList.toggle('hidden');
       };
       
       const changeType = () => {
-      document.getElementById('Food').classList.toggle('hidden');
-      document.getElementById('Exercise').classList.toggle('hidden');
-  
-      document.getElementById('foodLabel').classList.toggle('font-bold');
-      document.getElementById('exerciseLabel').classList.toggle('font-bold');
-  
-      document.getElementById('formAlimento').classList.toggle('hidden');
-      document.getElementById('formExercicio').classList.toggle('hidden');
-  
+          document.getElementById('Food').classList.toggle('hidden');
+          document.getElementById('Exercise').classList.toggle('hidden');
       
-  };
+          document.getElementById('foodLabel').classList.toggle('font-bold');
+          document.getElementById('exerciseLabel').classList.toggle('font-bold');
+      
+          document.getElementById('formAlimento').classList.toggle('hidden');
+          document.getElementById('formExercicio').classList.toggle('hidden');
+      };
       
       document.getElementById('Menu').onclick = toggleElements;
       
@@ -144,7 +142,7 @@
               }
           });
       }
-  
+      
       const nextBtn = document.getElementById('nextBtn');
       if (nextBtn) {
           nextBtn.addEventListener('click', () => {
@@ -165,6 +163,33 @@
       
       renderRows();
       updatePaginationButtons();
-  
-              });"
-            ]])))
+
+      // Novo script para tooltips - INÍCIO
+      const infoIcons = document.querySelectorAll('.fa-circle-info');
+
+      infoIcons.forEach(icon => {
+        icon.addEventListener('click', function(event) {
+          event.preventDefault(); // Previne qualquer ação padrão
+
+          const tooltipContainer = this.closest('.group');
+          const tooltipContent = tooltipContainer.querySelector('.tooltip-content');
+
+          if (tooltipContent) {
+            tooltipContent.classList.toggle('hidden'); // Alterna a visibilidade
+          }
+        });
+      });
+
+      // Opcional: Esconder tooltips ao clicar fora deles
+      document.addEventListener('click', function(event) {
+        infoIcons.forEach(icon => {
+          const tooltipContainer = icon.closest('.group');
+          const tooltipContent = tooltipContainer.querySelector('.tooltip-content');
+          // Verifica se o tooltip está visível e se o clique não foi dentro do container do tooltip
+          if (tooltipContent && !tooltipContent.classList.contains('hidden') && !tooltipContainer.contains(event.target)) {
+            tooltipContent.classList.add('hidden');
+          }
+        });
+      });
+      // Novo script para tooltips - FIM
+            });"]])))
