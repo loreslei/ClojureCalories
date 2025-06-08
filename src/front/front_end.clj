@@ -8,7 +8,7 @@
    [hiccup.page :refer [html5]]))
 
 
-(defn home-page []
+(defn home-page [operacoes-para-exibir] ; Agora recebe os dados para exibir
   (html5 {:class "scroll-smooth"}
          {:lang "pt-br"}
          [:head
@@ -22,27 +22,27 @@
           [:link {:rel "icon" :href "assets/logo.png"}]
           [:script {:src "https://kit.fontawesome.com/16fe6351cd.js" :crossorigin "anonymous"}]
           [:style "
-       /* CHECKBOX TOGGLE SWITCH */
-       /* @apply rules for documentation, these do not work as inline style */
-       .toggle-checkbox:checked {
-           right: 0;
-           border-color: #68D391;
-       }
+        /* CHECKBOX TOGGLE SWITCH */
+        /* @apply rules for documentation, these do not work as inline style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #68D391;
+        }
     
-       .toggle-checkbox:checked+.toggle-label {
-           background-color: #68D391;
-       }
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #68D391;
+        }
     
-       body {
-           font-family: \"Montserrat\", sans-serif !important;
-       }
-     "]]
+        body {
+            font-family: \"Montserrat\", sans-serif !important;
+        }
+      "]]
          [:body.bg-slate-100.overflow-x-hidden
           (navbar)
           (user-section)
           (calories-section)
           (results-section)
-          (final-table)
+          (final-table operacoes-para-exibir) ; Passa os dados recebidos para final-table
           [:script
            "window.addEventListener('DOMContentLoaded', () => {
                 const toggleElements = () => {
@@ -52,16 +52,16 @@
     };
     
     const changeType = () => {
-  document.getElementById('Food').classList.toggle('hidden');
-  document.getElementById('Exercise').classList.toggle('hidden');
+    document.getElementById('Food').classList.toggle('hidden');
+    document.getElementById('Exercise').classList.toggle('hidden');
 
-  document.getElementById('foodLabel').classList.toggle('font-bold');
-  document.getElementById('exerciseLabel').classList.toggle('font-bold');
+    document.getElementById('foodLabel').classList.toggle('font-bold');
+    document.getElementById('exerciseLabel').classList.toggle('font-bold');
 
-  document.getElementById('formAlimento').classList.toggle('hidden');
-  document.getElementById('formExercicio').classList.toggle('hidden');
+    document.getElementById('formAlimento').classList.toggle('hidden');
+    document.getElementById('formExercicio').classList.toggle('hidden');
 
-  
+    
 };
     
     document.getElementById('Menu').onclick = toggleElements;
@@ -76,7 +76,7 @@
     let currentPage = 1;
     
     const tbody = document.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const rows = Array.from(tbody ? tbody.querySelectorAll('tr') : []); 
     const totalPages = Math.ceil(rows.length / rowsPerPage);
     
     const paginationContainer = document.getElementById('pagination');
@@ -96,6 +96,7 @@
     }
     
     function updatePaginationButtons() {
+        if (!paginationContainer) return; 
         paginationContainer.querySelectorAll('.page-btn').forEach(btn => btn.remove());
     
         const nextBtn = document.getElementById('nextBtn');
@@ -121,9 +122,11 @@
             paginationContainer.insertBefore(btn, nextBtn);
         }
     
-        document.getElementById('prevBtn').disabled = currentPage === 1;
-        document.getElementById('nextBtn').disabled = currentPage === totalPages;
-        document.getElementById('totalPages').innerHTML = totalPages;
+        const prevBtn = document.getElementById('prevBtn');
+        if (prevBtn) prevBtn.disabled = currentPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+        const totalPagesSpan = document.getElementById('totalPages');
+        if (totalPagesSpan) totalPagesSpan.innerHTML = totalPages;
     }
     
     function showPage(page) {
@@ -132,27 +135,35 @@
         updatePaginationButtons();
     }
     
-    document.getElementById('prevBtn').addEventListener('click', () => {
-        if (currentPage > 1) {
-            showPage(currentPage - 1);
-        }
-    });
+    const prevBtn = document.getElementById('prevBtn');
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+    }
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                showPage(currentPage + 1);
+            }
+        });
+    }
     
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            showPage(currentPage + 1);
-        }
-    });
-    
-    paginationContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('page-btn')) {
-            const page = parseInt(e.target.dataset.page);
-            showPage(page);
-        }
-    });
+    if (paginationContainer) {
+        paginationContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('page-btn')) {
+                const page = parseInt(e.target.dataset.page);
+                showPage(page);
+            }
+        });
+    }
     
     renderRows();
     updatePaginationButtons();
 
-             });
-           "]]))
+            });"
+          ]]))

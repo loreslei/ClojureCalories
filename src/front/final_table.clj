@@ -1,16 +1,8 @@
 (ns front.final-table
-  (:require [clj-http.client :as http]
-            [cheshire.core :as json]))
+  (:require [hiccup.form :refer [form-to]]))
 
-
-(defn final-table []
-  (let [; Busca dados reais da API
-        alimentos (-> (http/get "http://localhost:3000/listar/alimentos" {:as :json}) :body)
-        exercicios (-> (http/get "http://localhost:3000/listar/exercicios" {:as :json}) :body)
-
-        
-        todas-operacoes (sort-by :dataAdicao (concat alimentos exercicios))
-        
+(defn final-table [operacoes-para-exibir] ; Recebe as operações já filtradas
+  (let [todas-operacoes (sort-by :dataAdicao operacoes-para-exibir)
 
         ; Monta linhas da tabela
         linhas (map (fn [item]
@@ -34,23 +26,27 @@
 
         total (- (reduce + 0 (map :calorias (filter :alimento todas-operacoes)))
                  (reduce + 0 (map :calorias (filter :exercicio todas-operacoes))))
-        total-formatado (int total)
-        ]
+        total-formatado (int total)]
 
     [:div {:class "w-85/100 rounded-lg bg-white flex flex-col items-center mt-20 mb-20 shadow-2xl md:w-1/2 lg:w-1/3 mx-auto"}
      [:div {:class "relative flex flex-col w-full h-full overflow-auto text-gray-700 bg-white rounded-lg"}
-      [:div {:class "flex justify-center items-center gap-3 p-4 border-b border-slate-200"}
-       [:input {:type "date"
-                :id "dataInicio"
-                :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
-       [:span "até"]
-       [:input {:type "date"
-                :id "dataFim"
-                :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
-       [:button {:id "filtrarBtn"
-                 :class "bg-indigo-500 text-white px-4 py-1 rounded hover:bg-indigo-600 transition"}
-        "Filtrar"]]
-
+      
+       ;; O formulário submete para a rota /filtrar
+       (form-to [:get "/filtrar" {:id "formFiltro"}]
+                [:div {:class "flex flex-col md:flex-row justify-center items-center gap-3 p-4 border-b border-slate-200"}
+                [:input {:type "date"
+                         :name "dataInicio"
+                         :id "dataInicio"
+                         :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
+                [:span "até"]
+                [:input {:type "date"
+                         :name "dataFim"
+                         :id "dataFim"
+                         :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
+                [:button {:id "filtrarBtn"
+                          :type "submit"
+                          :class "bg-indigo-500 cursor-pointer text-white px-4 py-1 rounded hover:bg-indigo-600 transition"}
+                 "Filtrar"]])
       [:table {:class "w-full text-left table-auto min-w-max appearance-none"}
        [:thead {:class "rounded-xl"}
         [:tr

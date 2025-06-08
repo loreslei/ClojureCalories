@@ -1,9 +1,9 @@
 (ns app-clojure.user
   (:require
-   [app-clojure.food-calories :refer [alimentos-atom]]
-   [app-clojure.food-exercises :refer [exercicios-atom]]))
+   [app-clojure.data-store :refer [alimentos-atom exercicios-atom]] ; <--- IMPORTE OS ÁTOMOS DO data-store AQUI
+   [ring.util.response :refer [redirect response]])) ; Adicione 'redirect' e 'response' para usar na resposta HTTP
 
-;; Atom para armazenar exercicios e calorias
+;; Atom para armazenar dados do usuário (este sim pode ser local, se for um único usuário)
 (def usuario-atom (atom []))
 
 (defn registrar-ususario [req]
@@ -11,40 +11,24 @@
         genero (:genero (:params req))
         idade (:idade (:params req))
         altura (:altura (:params req))
-        peso (:peso (:params req)) 
+        peso (:peso (:params req))
         registro {:nome nome
                   :genero genero
                   :idade idade
                   :altura altura
-                  :peso peso
-                  }
-        ]
-    (reset! usuario-atom registro) 
-    (reset! alimentos-atom nil)
-    (reset! exercicios-atom nil)
-    
-    {:status 302
-     :headers {"Location" "/"}
-     :body ""}))
+                  :peso peso}]
 
-;; Rota GET para listar exercicios salvos
+    (reset! usuario-atom registro) ; Atualiza os dados do usuário
+
+    
+    (reset! alimentos-atom nil) 
+    (reset! exercicios-atom nil)
+
+    ;; Redireciona para a página principal após o registro do usuário
+    (redirect "/"))) ; Use `redirect` para que o navegador recarregue a página
+
+;; Função para listar dados do usuário
 (defn listar-usuario [_]
   {:status 200
    :headers {"Content-Type" "application/json"}
-   :body @usuario-atom})
-
-
-;;    {:status 200
-;;    :headers {"Content-Type" "text/html; charset=utf-8"}
-;;    :body (str "<h2>Usuario registrado: " nome "</h2>"
-;;               "<a href='/'>Voltar</a>")}))
-
-;; ;; Rota GET para listar exercicios salvos
-;; (defn listar-usuario [_]
-;;   {:status 200
-;;    :body @usuario-atom})
-
-
-
-
-
+   :body (str (cheshire.core/generate-string @usuario-atom))})

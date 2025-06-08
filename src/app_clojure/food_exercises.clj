@@ -2,14 +2,16 @@
   (:require
    [app-clojure.tradutor :refer [capitalizar traduzir-pt-en]]
    [app-clojure.nutrition :refer [buscar-exercicio]]
-   [clj-time.core :as t]      ; <-- Importe clj-time.core
-   [clj-time.format :as f]))  ; <-- Importe clj-time.format
+   [clj-time.core :as t]
+   [clj-time.format :as f]
+   [app-clojure.data-store :refer [exercicios-atom]] ; <--- IMPORTA O ÁTOMO COMPARTILHADO
+   [ring.util.response :refer [redirect response]])) ; Adicione 'response' se necessário, e 'redirect'
+
+;; Remova a definição do átomo local aqui:
+;; (def exercicios-atom (atom []))
 
 ;; Um formatador de data/hora ISO 8601, ideal para ordenação.
 (def iso-formatter (f/formatter :date-time-no-ms))
-
-;; Atom para armazenar exercicios e calorias
-(def exercicios-atom (atom []))
 
 ;; Função para registrar um exercício
 (defn registrar-exercicio [req]
@@ -17,20 +19,26 @@
         exercicio-en (traduzir-pt-en exercicio-pt)
         resultado (first (buscar-exercicio exercicio-en))
         data-str (get-in req [:params :data]) ; <-- pega a string do input date (yyyy-MM-dd)
-        data-parseada (f/parse (f/formatter "yyyy-MM-dd") data-str) ; <-- parse ISO
+
+        data-parseada (if (and data-str (not (empty? data-str)))
+                        (try
+                          (f/parse (f/formatter "yyyy-MM-dd") data-str)
+                          (catch Exception _ (t/now))) ; Se houver erro no parse, usa a data atual
+                        (t/now)) ; Se data-str for vazia ou nula, usa a data atual
+
         data-formatada (f/unparse (f/formatter "dd-MM-yyyy") data-parseada) ; <-- converte para dd-MM-yyyy
         registro {:exercicio (capitalizar exercicio-pt)
                   :calorias (:nf_calories resultado)
                   :dataRegistro (f/unparse iso-formatter (t/now)) ; data de envio 
                   :dataAdicao data-formatada}] ; data informada pelo usuário
-    (swap! exercicios-atom conj registro)
-    ;; Redirect para a página principal
-    {:status 302
-     :headers {"Location" "/"}
-     :body ""}))
 
-;; Função para listar exercícios salvos
+    (swap! exercicios-atom conj registro) ; <--- ATUALIZA O ÁTOMO COMPARTILHADO
+
+    ;; Redirect para a página principal
+    (redirect "/")))
+
+;; Função para listar exercícios salvos (lê do átomo compartilhado)
 (defn listar-exercicios [_]
   {:status 200
    :headers {"Content-Type" "application/json"}
-   :body @exercicios-atom})
+   :body (str (cheshire.core/generate-string @exercicios-atom))}) ; <--- LÊ DO ÁTOMO COMPARTILHADO E RETORNA JSON
