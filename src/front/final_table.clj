@@ -1,7 +1,8 @@
 (ns front.final-table
   (:require [hiccup.form :refer [form-to]]))
 
-(defn final-table [operacoes-para-exibir] ; Recebe as operações já filtradas
+;; A função final-table agora aceitará as datas de início e fim do filtro
+(defn final-table [operacoes-para-exibir data-inicio-filtro data-fim-filtro]
   (let [todas-operacoes (sort-by :dataAdicao operacoes-para-exibir)
 
         ; Monta linhas da tabela
@@ -30,18 +31,19 @@
 
     [:div {:class "w-85/100 rounded-lg bg-white flex flex-col items-center mt-20 mb-20 shadow-2xl md:w-1/2 lg:w-1/3 mx-auto"}
      [:div {:class "relative flex flex-col w-full h-full overflow-auto text-gray-700 bg-white rounded-lg"}
-      
-       ;; O formulário submete para a rota /filtrar
        (form-to [:get "/filtrar" {:id "formFiltro"}]
-                [:div {:class "flex flex-col md:flex-row justify-center items-center gap-3 p-4 border-b border-slate-200"}
+      [:div {:class "flex flex-col md:flex-row justify-center items-center gap-3 p-4 border-b border-slate-200"}
+                
                 [:input {:type "date"
                          :name "dataInicio"
                          :id "dataInicio"
+                         :value data-inicio-filtro ; <--- Adiciona o valor
                          :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
                 [:span "até"]
                 [:input {:type "date"
                          :name "dataFim"
                          :id "dataFim"
+                         :value data-fim-filtro ; <--- Adiciona o valor
                          :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
                 [:button {:id "filtrarBtn"
                           :type "submit"

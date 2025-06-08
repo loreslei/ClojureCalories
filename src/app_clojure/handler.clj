@@ -12,12 +12,11 @@
             [app-clojure.food-exercises :refer [listar-exercicios registrar-exercicio]]
             [app-clojure.user :refer [listar-usuario registrar-ususario]]
             [app-clojure.filter :refer [filtrar-data]]
-            [app-clojure.data-store :refer [alimentos-atom exercicios-atom carregar-dados-iniciais!]]))
+            [app-clojure.data-store :refer [alimentos-atom exercicios-atom filtro-datas-atom carregar-dados-iniciais!]])) ; <--- Importe o novo átomo aqui
 
-;; Carrega os dados iniciais quando o handler é carregado.
-;; Já é chamado no `app-clojure.data-store`, então não precisa ser aqui novamente.
+;; Garante que os dados iniciais sejam carregados uma vez ao iniciar o handler.
 
-;; Controller de perda (mantido como está)
+;; Controllers (mantidos como está)
 (defn calcular-perda [req]
   (let [{:keys [peso calorias]} (:body req)]
     (if (and peso calorias)
@@ -25,7 +24,6 @@
       (status (response {:status "error"
                          :message "Parâmetros 'peso' e 'calorias' são obrigatórios."}) 400))))
 
-;; Controller de ganho (mantido como está)
 (defn calcular-ganho [req]
   (let [{:keys [peso calorias]} (:body req)]
     (if (and peso calorias)
@@ -35,10 +33,10 @@
 
 ;; Definição de rotas
 (defroutes app-routes
-  ;; Rotas de registro - CORREÇÃO AQUI: adicione `req` como argumento para as funções
-  (POST "/registrar/alimento" req (registrar-alimento req)) ; <--- CORRIGIDO
-  (POST "/registrar/exercicio" req (registrar-exercicio req)) ; <--- CORRIGIDO
-  (POST "/registrar/usuario" req (registrar-ususario req)) ; Provavelmente também precisa de `req`
+  ;; Rotas de registro
+  (POST "/registrar/alimento" req (registrar-alimento req))
+  (POST "/registrar/exercicio" req (registrar-exercicio req))
+  (POST "/registrar/usuario" req (registrar-ususario req))
 
   ;; Rotas de listagem: Continuam retornando JSON, lendo dos átomos globais
   (GET "/listar/alimentos" [] (listar-alimentos nil))
@@ -48,11 +46,13 @@
   ;; Rota para a página inicial (sem filtro aplicado inicialmente)
   (GET "/" []
     (let [todas-operacoes (sort-by :dataAdicao (concat @alimentos-atom @exercicios-atom))]
+      ;; Limpa as datas do filtro ao acessar a home diretamente (sem filtro)
+      (reset! filtro-datas-atom {:dataInicio nil :dataFim nil})
       (home-page todas-operacoes)))
 
   ;; Rota para o filtro
   (GET "/filtrar" req
-    (let [operacoes-filtradas (filtrar-data req)]
+    (let [operacoes-filtradas (filtrar-data req)] ; filtrar-data já atualiza o filtro-datas-atom
       (home-page operacoes-filtradas)))
 
   (route/not-found {:status 404 :body "Não encontrado"}))
