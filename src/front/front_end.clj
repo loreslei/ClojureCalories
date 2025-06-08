@@ -164,32 +164,48 @@
       renderRows();
       updatePaginationButtons();
 
-      // Novo script para tooltips - INÍCIO
+      // Script para tooltips
       const infoIcons = document.querySelectorAll('.fa-circle-info');
 
       infoIcons.forEach(icon => {
         icon.addEventListener('click', function(event) {
-          event.preventDefault(); // Previne qualquer ação padrão
+          event.preventDefault();
 
           const tooltipContainer = this.closest('.group');
           const tooltipContent = tooltipContainer.querySelector('.tooltip-content');
 
           if (tooltipContent) {
-            tooltipContent.classList.toggle('hidden'); // Alterna a visibilidade
+            tooltipContent.classList.toggle('hidden');
           }
         });
       });
 
-      // Opcional: Esconder tooltips ao clicar fora deles
       document.addEventListener('click', function(event) {
         infoIcons.forEach(icon => {
           const tooltipContainer = icon.closest('.group');
           const tooltipContent = tooltipContainer.querySelector('.tooltip-content');
-          // Verifica se o tooltip está visível e se o clique não foi dentro do container do tooltip
           if (tooltipContent && !tooltipContent.classList.contains('hidden') && !tooltipContainer.contains(event.target)) {
             tooltipContent.classList.add('hidden');
           }
         });
       });
-      // Novo script para tooltips - FIM
+
+      // NOVO SCRIPT PARA FORMATAR DATAS NA TABELA - INÍCIO
+      const dateCells = document.querySelectorAll('.final-table-date'); // Adicionei uma classe para facilitar a seleção
+      
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        // Divide a string da data pelo '-'
+        const parts = dateString.split('-');
+        // Se tiver 3 partes (dia, mês, ano), reordena e junta com '/'
+        if (parts.length === 3) {
+          return `${parts[0]}/${parts[1]}/${parts[2]}`;
+        }
+        return dateString; // Retorna a string original se não estiver no formato esperado
+      };
+
+      dateCells.forEach(cell => {
+        cell.textContent = formatDate(cell.textContent);
+      });
+      // NOVO SCRIPT PARA FORMATAR DATAS NA TABELA - FIM
             });"]])))

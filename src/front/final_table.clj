@@ -5,12 +5,17 @@
 (defn final-table [operacoes-para-exibir data-inicio-filtro data-fim-filtro]
   (let [todas-operacoes (sort-by :dataAdicao operacoes-para-exibir)
 
+        ;; NOVO: Função para formatar a data
+        format-date (fn [date-str]
+                      (when date-str
+                        (clojure.string/replace date-str "-" "/")))
+
         ; Monta linhas da tabela
         linhas (map (fn [item]
                       (let [tipo (if (:alimento item) "Ganho" "Perda")
                             nome (or (:alimento item) (:exercicio item))
                             calorias (int (:calorias item))
-                            data (:dataAdicao item)
+                            data (format-date (:dataAdicao item)) ; <-- APLICANDO A FORMATAÇÃO AQUI
                             cor (case tipo
                                   "Ganho" "bg-emerald-100 text-emerald-800"
                                   "Perda" "bg-red-100 text-red-800")]
@@ -21,7 +26,7 @@
                           [:p {:class "text-sm text-slate-700"} nome]]
                          [:td {:class "p-4 py-3 whitespace-nowrap"}
                           [:p {:class "text-sm font-semibold text-slate-700"} calorias]]
-                         [:td {:class "p-4 py-3 whitespace-nowrap"}
+                         [:td {:class "p-4 py-3 whitespace-nowrap final-table-date"} ; <-- MANTIDA A CLASSE PARA FUTURAS MANIPULAÇÕES JS SE NECESSÁRIO
                           [:p {:class "text-sm text-slate-700"} data]]]))
                     todas-operacoes)
 
@@ -31,9 +36,9 @@
 
     [:div {:class "w-85/100 rounded-lg bg-white flex flex-col items-center mt-20 mb-20 shadow-2xl md:w-1/2 lg:w-1/3 mx-auto"}
      [:div {:class "relative flex flex-col w-full h-full overflow-auto text-gray-700 bg-white rounded-lg"}
-       (form-to [:get "/filtrar" {:id "formFiltro"}]
-      [:div {:class "flex flex-col md:flex-row justify-center items-center gap-3 p-4 border-b border-slate-200"}
-                
+      (form-to [:get "/filtrar" {:id "formFiltro"}]
+               [:div {:class "flex flex-col md:flex-row justify-center items-center gap-3 p-4 border-b border-slate-200"}
+
                 [:input {:type "date"
                          :name "dataInicio"
                          :id "dataInicio"
