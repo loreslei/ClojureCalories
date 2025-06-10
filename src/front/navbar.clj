@@ -1,5 +1,5 @@
 (ns front.navbar (:require
-                        [hiccup.element :refer [link-to]]))
+                  [hiccup.element :refer [link-to]]))
 
 
 (defn navbar []

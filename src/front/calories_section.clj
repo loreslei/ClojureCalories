@@ -22,7 +22,6 @@
                 [:p {:class "p-2 text-slate-600 font-semibold"} "Alimento"]
                 [:div {:class "relative group cursor-pointer"}
                  [:i {:class "fa-solid fa-circle-info text-slate-600 transition-all duration-200 hover:text-indigo-500"}]
-                 ;; ALTERADO AQUI: adicionado lg:group-hover:block e a classe tooltip-content
                  [:div {:class "absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden lg:group-hover:block w-64 bg-gray-800 text-white text-sm p-3 rounded-lg shadow-lg z-10 tooltip-content"}
                   "Escreva no formato:"
                   [:br]
@@ -37,7 +36,7 @@
                [:div {:class "flex items-center"}
                 [:div {:class "h-10 w-11 rounded-l-xl border-y-1 border-l-1 border-slate-300 p-2 flex items-center justify-center"}
                  [:i {:class "fa-solid fa-burger text-slate-700"}]]
-                [:input {:name "alimento" :class "h-10 w-full rounded-r-xl border-1 border-slate-300 p-2 text-slate-600 focus:outline-indigo-600" :placeholder "Nome do Alimento e Porção"}]]
+                [:input {:name "alimento" :class "h-10 w-full rounded-r-xl border-1 border-slate-300 p-2 text-slate-600 focus:outline-indigo-600" :placeholder "Nome do Alimento e Quantidade"}]]
                [:p {:class "p-2 text-slate-600 font-semibold mt-3"} "Data"]
                [:div {:class "flex items-center"}
                 [:div {:class "h-10 w-11 rounded-l-xl border-y-1 border-l-1 border-slate-300 p-2 flex items-center justify-center"}
@@ -53,7 +52,6 @@
                 [:p {:class "p-2 text-slate-600 font-semibold"} "Exercício"]
                 [:div {:class "relative group cursor-pointer"}
                  [:i {:class "fa-solid fa-circle-info text-slate-600 transition-all duration-200 hover:text-indigo-500"}]
-                 ;; ALTERADO AQUI: adicionado lg:group-hover:block e a classe tooltip-content
                  [:div {:class "absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden lg:group-hover:block w-64 bg-gray-800 text-white text-sm p-3 rounded-lg shadow-lg z-10 tooltip-content"}
                   "Escreva no formato:"
                   [:br]

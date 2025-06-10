@@ -1,13 +1,13 @@
 (ns app-clojure.filter
   (:require [clj-time.format :as f]
-            [app-clojure.data-store :refer [alimentos-atom exercicios-atom filtro-datas-atom]])) ; <--- Importe o novo átomo
+            [app-clojure.data-store :refer [alimentos-atom exercicios-atom filtro-datas-atom]]))
 
 (defn filtrar-por-data [operacoes data-inicio-str data-fim-str]
   "Filtra uma lista de operações por um intervalo de datas.
    data-inicio-str e data-fim-str devem estar no formato 'yyyy-MM-dd' (do input HTML).
    A dataAdicao dos itens deve estar no formato 'dd-MM-yyyy'."
   (let [formatter-input (f/formatter "yyyy-MM-dd") ; Formato esperado do input HTML
-        formatter-data-adicao (f/formatter "dd-MM-yyyy") ; Formato em que dataAdicao está nos seus dados
+        formatter-data-adicao (f/formatter "dd-MM-yyyy") ; Formato dataAdicao 
 
         data-inicio (if (and data-inicio-str (not (empty? data-inicio-str)))
                       (f/parse formatter-input data-inicio-str)

@@ -1,11 +1,22 @@
 (ns front.final-table
-  (:require [hiccup.form :refer [form-to]]))
+  (:require [hiccup.form :refer [form-to]])
+  (:import [java.time LocalDate]
+           [java.time.format DateTimeFormatter]))
 
-;; A função final-table agora aceitará as datas de início e fim do filtro
 (defn final-table [operacoes-para-exibir data-inicio-filtro data-fim-filtro]
-  (let [todas-operacoes (sort-by :dataAdicao operacoes-para-exibir)
+  (let [formatter (DateTimeFormatter/ofPattern "dd-MM-yyyy")
 
-        ;; NOVO: Função para formatar a data
+
+        parse-date-fn (fn [operacao]
+                        (try
+                          (LocalDate/parse (:dataAdicao operacao) formatter)
+                          (catch Exception e (LocalDate/of 1900 1 1))))
+
+        ;; Ordena pela data REAL e depois inverte para ter os mais recentes primeiro.
+        todas-operacoes (reverse (sort-by parse-date-fn operacoes-para-exibir))
+
+
+        ;; Função para formatar a data para exibição
         format-date (fn [date-str]
                       (when date-str
                         (clojure.string/replace date-str "-" "/")))
@@ -15,7 +26,7 @@
                       (let [tipo (if (:alimento item) "Ganho" "Perda")
                             nome (or (:alimento item) (:exercicio item))
                             calorias (int (:calorias item))
-                            data (format-date (:dataAdicao item)) ; <-- APLICANDO A FORMATAÇÃO AQUI
+                            data (format-date (:dataAdicao item))
                             cor (case tipo
                                   "Ganho" "bg-emerald-100 text-emerald-800"
                                   "Perda" "bg-red-100 text-red-800")]
@@ -26,7 +37,7 @@
                           [:p {:class "text-sm text-slate-700"} nome]]
                          [:td {:class "p-4 py-3 whitespace-nowrap"}
                           [:p {:class "text-sm font-semibold text-slate-700"} calorias]]
-                         [:td {:class "p-4 py-3 whitespace-nowrap final-table-date"} ; <-- MANTIDA A CLASSE PARA FUTURAS MANIPULAÇÕES JS SE NECESSÁRIO
+                         [:td {:class "p-4 py-3 whitespace-nowrap final-table-date"}
                           [:p {:class "text-sm text-slate-700"} data]]]))
                     todas-operacoes)
 
@@ -42,13 +53,13 @@
                 [:input {:type "date"
                          :name "dataInicio"
                          :id "dataInicio"
-                         :value data-inicio-filtro ; <--- Adiciona o valor
+                         :value data-inicio-filtro
                          :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
                 [:span "até"]
                 [:input {:type "date"
                          :name "dataFim"
                          :id "dataFim"
-                         :value data-fim-filtro ; <--- Adiciona o valor
+                         :value data-fim-filtro
                          :class "border border-slate-300 rounded px-2 py-1 text-sm"}]
                 [:button {:id "filtrarBtn"
                           :type "submit"
@@ -73,7 +84,7 @@
          [:td {:class "p-4 py-3 whitespace-nowrap" :colspan 3}
           [:p {:class "text-sm text-center font-semibold text-slate-700"} (str total-formatado " calorias")]]]]]
 
-      ;; Paginação fictícia
+
       [:div {:class "flex flex-col gap-3 md:flex-row justify-between items-center px-4 py-3"}
        [:div {:class "text-sm text-slate-500"}
         "Resultados " [:b "1-6"] " de " [:span {:id "totalPages"} "1"] " página(s)"]

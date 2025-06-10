@@ -1,9 +1,9 @@
 (ns app-clojure.user
   (:require
-   [app-clojure.data-store :refer [alimentos-atom exercicios-atom]] ; <--- IMPORTE OS ÁTOMOS DO data-store AQUI
-   [ring.util.response :refer [redirect response]])) ; Adicione 'redirect' e 'response' para usar na resposta HTTP
+   [app-clojure.data-store :refer [alimentos-atom exercicios-atom]]
+   [ring.util.response :refer [redirect]]))
 
-;; Atom para armazenar dados do usuário (este sim pode ser local, se for um único usuário)
+
 (def usuario-atom (atom []))
 
 (defn registrar-ususario [req]
@@ -18,16 +18,15 @@
                   :altura altura
                   :peso peso}]
 
-    (reset! usuario-atom registro) ; Atualiza os dados do usuário
+    (reset! usuario-atom registro)
 
-    
-    (reset! alimentos-atom nil) 
+
+    (reset! alimentos-atom nil)
     (reset! exercicios-atom nil)
 
-    ;; Redireciona para a página principal após o registro do usuário
-    (redirect "/"))) ; Use `redirect` para que o navegador recarregue a página
+    (redirect "/")))
 
-;; Função para listar dados do usuário
+
 (defn listar-usuario [_]
   {:status 200
    :headers {"Content-Type" "application/json"}

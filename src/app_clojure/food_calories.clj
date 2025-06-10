@@ -4,13 +4,11 @@
    [app-clojure.nutrition :refer [buscar-alimento]]
    [clj-time.core :as t]
    [clj-time.format :as f]
-   [app-clojure.data-store :refer [alimentos-atom]] ; <--- IMPORTE O ÁTOMO COMPARTILHADO AQUI
-   [ring.util.response :refer [redirect response]])) ; Adicione 'redirect' e 'response' se não estiverem
+   [app-clojure.data-store :refer [alimentos-atom]]
+   [ring.util.response :refer [redirect]]))
 
-;; Remova a definição local do átomo. Ele agora é importado de app-clojure.data-store.
-;; (def alimentos-atom (atom []))
 
-;; Um formatador de data/hora ISO 8601. É um formato universalmente aceito e fácil de ordenar.
+;; Um formatador de data/hora
 (def iso-formatter (f/formatter :date-time-no-ms))
 
 ;; Função para registrar um alimento
@@ -20,12 +18,12 @@
         resultado (first (buscar-alimento alimento-en))
         data-str (get-in req [:params :data]) ; <-- pega a string do input date (yyyy-MM-dd)
 
-        ;; Garante que data-parseada seja um objeto de data ou nil, não erro
+        ;; Garante que data-parseada seja um objeto de data ou nil
         data-parseada (if (and data-str (not (empty? data-str)))
                         (try
                           (f/parse (f/formatter "yyyy-MM-dd") data-str)
-                          (catch Exception _ (t/now))) ; Se houver erro no parse, usa a data atual
-                        (t/now)) ; Se data-str for vazia ou nula, usa a data atual
+                          (catch Exception _ (t/now)))
+                        (t/now))
 
         data-formatada (f/unparse (f/formatter "dd-MM-yyyy") data-parseada) ; <-- converte para dd-MM-yyyy
         registro {:alimento (capitalizar alimento-pt)
@@ -33,14 +31,13 @@
                   :dataRegistro (f/unparse iso-formatter (t/now)) ; data do sistema
                   :dataAdicao data-formatada}] ; <-- data fornecida pelo usuário, formatada
 
-    (swap! alimentos-atom conj registro) ; <--- ATUALIZA O ÁTOMO COMPARTILHADO
+    (swap! alimentos-atom conj registro)
 
-    ;; Redireciona para a página principal para recarregar a tabela com os novos dados
-    (redirect "/"))) ; <--- Use `redirect` para que o navegador recarregue a página
 
-;; Função para listar alimentos salvos (lê do átomo compartilhado)
+    (redirect "/")))
+
+;; Função para listar alimentos salvos
 (defn listar-alimentos [_]
-  ;; Esta função é a API que retorna JSON, lendo do átomo global
   {:status 200
    :headers {"Content-Type" "application/json"}
-   :body (str (cheshire.core/generate-string @alimentos-atom))}) ; <--- LÊ DO ÁTOMO COMPARTILHADO E RETORNA JSON
+   :body (str (cheshire.core/generate-string @alimentos-atom))}) ; RETORNA JSON

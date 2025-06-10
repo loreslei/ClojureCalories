@@ -6,10 +6,10 @@
    [front.navbar :refer [navbar]]
    [front.user-section :refer [user-section]]
    [hiccup.page :refer [html5]]
-   [app-clojure.data-store :refer [filtro-datas-atom]])) ; <--- Importe o átomo do filtro aqui
+   [app-clojure.data-store :refer [filtro-datas-atom]]))
 
-(defn home-page [operacoes-para-exibir] ; Recebe os dados para exibir
-  (let [{:keys [dataInicio dataFim]} @filtro-datas-atom] ; Obtém as datas do átomo
+(defn home-page [operacoes-para-exibir]
+  (let [{:keys [dataInicio dataFim]} @filtro-datas-atom]
     (html5 {:class "scroll-smooth"}
            {:lang "pt-br"}
            [:head
@@ -43,7 +43,7 @@
             (user-section)
             (calories-section)
             (results-section)
-            (final-table operacoes-para-exibir dataInicio dataFim) ; <--- Passa as datas para final-table
+            (final-table operacoes-para-exibir dataInicio dataFim)
             [:script
              "window.addEventListener('DOMContentLoaded', () => {
                 const toggleElements = () => {

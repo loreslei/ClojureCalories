@@ -1,7 +1,6 @@
 (ns app-clojure.nutrition
-  (:require [clj-http.client :as http] 
-            [cheshire.core :as json]
-            )
+  (:require [clj-http.client :as http]
+            [cheshire.core :as json])
   (:gen-class))
 
 (def app-id (System/getenv "app_id"))
@@ -42,5 +41,4 @@
                :age idade})
 
         resposta (http/post url {:headers headers :body body :as :json :keywords? true})]
-    (println genero peso altura idade)
     (get-in resposta [:body :exercises])))

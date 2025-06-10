@@ -4,13 +4,10 @@
    [app-clojure.nutrition :refer [buscar-exercicio]]
    [clj-time.core :as t]
    [clj-time.format :as f]
-   [app-clojure.data-store :refer [exercicios-atom]] ; <--- IMPORTA O ÁTOMO COMPARTILHADO
-   [ring.util.response :refer [redirect response]])) ; Adicione 'response' se necessário, e 'redirect'
+   [app-clojure.data-store :refer [exercicios-atom]]
+   [ring.util.response :refer [redirect]]))
 
-;; Remova a definição do átomo local aqui:
-;; (def exercicios-atom (atom []))
-
-;; Um formatador de data/hora ISO 8601, ideal para ordenação.
+; Um formatador de data/hora
 (def iso-formatter (f/formatter :date-time-no-ms))
 
 ;; Função para registrar um exercício
@@ -23,8 +20,8 @@
         data-parseada (if (and data-str (not (empty? data-str)))
                         (try
                           (f/parse (f/formatter "yyyy-MM-dd") data-str)
-                          (catch Exception _ (t/now))) ; Se houver erro no parse, usa a data atual
-                        (t/now)) ; Se data-str for vazia ou nula, usa a data atual
+                          (catch Exception _ (t/now)))
+                        (t/now))
 
         data-formatada (f/unparse (f/formatter "dd-MM-yyyy") data-parseada) ; <-- converte para dd-MM-yyyy
         registro {:exercicio (capitalizar exercicio-pt)
@@ -32,13 +29,13 @@
                   :dataRegistro (f/unparse iso-formatter (t/now)) ; data de envio 
                   :dataAdicao data-formatada}] ; data informada pelo usuário
 
-    (swap! exercicios-atom conj registro) ; <--- ATUALIZA O ÁTOMO COMPARTILHADO
+    (swap! exercicios-atom conj registro)
 
-    ;; Redirect para a página principal
+
     (redirect "/")))
 
-;; Função para listar exercícios salvos (lê do átomo compartilhado)
+;; Função para listar exercícios salvos
 (defn listar-exercicios [_]
   {:status 200
    :headers {"Content-Type" "application/json"}
-   :body (str (cheshire.core/generate-string @exercicios-atom))}) ; <--- LÊ DO ÁTOMO COMPARTILHADO E RETORNA JSON
+   :body (str (cheshire.core/generate-string @exercicios-atom))})
